@@ -1,0 +1,121 @@
+@import url('https://fonts.googleapis.com/css2?family=Edu+TAS+Beginner:wght@500&family=Jost:ital,wght@1,500&family=Pacifico&display=swap');
+/*Lê Đức Tài, Bùi Ngọc Na*/
+
+header {
+    position: relative;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+}
+
+    header img {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: -1; /* Đặt z-index là -1 để đảm bảo hình nền chìm dưới tiêu đề */
+    }
+
+
+.container {
+    position: relative;
+    z-index: 1; /* Đặt z-index là 1 để đảm bảo tiêu đề đè lên hình nền */
+}
+
+.text-center {
+    color: white; /* Điều này giúp văn bản trở nên dễ đọc trên hình nền */
+}
+
+.navbar {
+    position: fixed;
+    background-color: #85C1E9;
+}
+.custom-navbar-brand {
+    font-family: 'Pacifico', cursive;
+    text-decoration: none;
+    color: #454545;
+    font-size: 2em;
+}
+.custom-nav-item {
+    font-size: 16px;
+    text-align: right;
+    font-weight: 500;
+    transition: transform 0.3s ease; /* Thêm transition để tạo hiệu ứng mượt mà */
+}
+
+    .custom-nav-item:hover {
+        font-weight: 600;
+        color: #454545;
+        transform: translateY(-5px); /* Di chuyển chữ lên trên màn hình */
+    }
+
+#moveToTopBtn {
+    position: fixed;
+    bottom: 30px;
+    right: 20px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    float: right;
+    /*Lê Đức Tài, Bùi Ngọc Na*/
+    background-color: #85C1E9;
+    padding: 13px 20px;
+    color: rgb(18, 10, 10);
+    border: none;
+    cursor: pointer;
+    border-radius: 50px;
+    z-index: 100;
+    transition: transform 0.3s ease; /* Tạo hiệu ứng chuyển động mượt mà */
+    box-shadow: none; /* Bắt đầu với bóng đổ ẩn */
+}
+
+    #moveToTopBtn:hover {
+        transform: scale(1.05); /* Phóng to thẻ card khi con chuột hover vào */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Hiển thị bóng đổ khi hover */
+    }
+    .custom-nav-link {
+        text-decoration: none;
+        color: #333;
+        padding: 10px 20px;
+        display: block;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+
+.main-content {
+    flex: 1;
+}
+
+.dropdown-menu {
+    border-radius: 10px;
+    padding: 10px 0; /* Tăng khoảng cách giữa các mục */
+}
+
+.description-text {
+    text-align: justify; /* Căn đều văn bản */
+    max-width: 100%; /* Giới hạn chiều rộng tối đa */
+    margin: 0 auto; /* Căn giữa theo chiều ngang */
+}
+
+
+
+.card {
+    transition: transform 0.3s ease; /* Tạo hiệu ứng chuyển động mượt mà */
+    box-shadow: none; /* Bắt đầu với bóng đổ ẩn */
+}
+
+    .card:hover {
+        transform: scale(1.05); /* Phóng to thẻ card khi con chuột hover vào */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Hiển thị bóng đổ khi hover */
+    }
+
+footer.custom-footer {
+    background-color: #2E2E2E;
+    color: #ffffff;
+}
+
+/*Lê Đức Tài, Bùi Ngọc Na*/
