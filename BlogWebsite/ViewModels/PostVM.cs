@@ -11,5 +11,9 @@ namespace BlogWebsite.ViewModels
 		public DateTime CreateDate { get; set; }
 		public string? ThumbnailUrl { get; set; }
 		public int LikeCount { get; set; }
-	}
+        public DateTime ModifiedDate { get; set; }
+        public int WritingPhaseID { get; set; }
+        public string? Download_path { get; set; }
+        public decimal Royalty { get; set; }
+    }
 }

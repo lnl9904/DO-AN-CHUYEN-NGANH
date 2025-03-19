@@ -1,6 +1,6 @@
-﻿namespace BlogWebsite.Models
+﻿namespace BlogWebsite.ViewModels.WritingPhases
 {
-    public class WritingPhases
+    public class EditWritingPhasesVM
     {
         public int Id { get; set; }
         public string? Title { get; set; }
@@ -11,7 +11,5 @@
         public DateTime ModifiedAt { get; set; }
         public bool Is_Opening_registration { get; set; }
         public int RegistrationPeriodID { get; set; }
-        public RegistrationPeriods? RegistrationPeriods { get; set; }
-        public ICollection<Post>? posts { get; set; }
     }
 }
