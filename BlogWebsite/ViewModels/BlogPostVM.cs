@@ -13,8 +13,12 @@ namespace BlogWebsite.ViewModels
 		public string? ThumbnailUrl { get; set; }
 		public string? TagName { get; set; }
 		public int? TagId { get; set; }
+        public DateTime ModifiedDate { get; set; }
+        public int WritingPhaseID { get; set; }
+        public string? Download_path { get; set; }
+        public decimal Royalty { get; set; }
 
-		public int LikeCount { get; set; }
+        public int LikeCount { get; set; }
 
 		public List<Comment> Comments { get; set; }
 		public List<Comment> MyComments { get; set; } // Danh sách các comment của người dùng hiện tại
