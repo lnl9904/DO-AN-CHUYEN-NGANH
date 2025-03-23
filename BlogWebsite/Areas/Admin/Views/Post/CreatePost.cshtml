@@ -25,11 +25,35 @@
 							<datalist id="tags-list"></datalist>
 							<span asp-validation-for="TagName" class="text-danger"></span>
 						</div>
+						<!-- Writing Phase -->
+						<div class="mb-2">
+							<label>Writing Phase</label>
+							<select asp-for="WritingPhaseID" asp-items="@(new SelectList(Model.WritingPhases, "Id", "Name"))" class="form-control">
+								<option value="">-- Select Writing Phase --</option>
+							</select>
+							<span asp-validation-for="WritingPhaseID" class="text-danger"></span>
+						</div>
+
+						<!-- Description -->
 						<div class="mb-2">
 							<label>Description</label>
-							<textarea id="textarea" asp-for="Description" class="form-control" rows="8"></textarea>
+							<textarea asp-for="Description" class="form-control" rows="4"></textarea>
 							<span asp-validation-for="Description" class="text-danger"></span>
 						</div>
+
+						<!-- Created Date -->
+						<div class="mb-2">
+							<label>Created Date</label>
+							<input type="text" asp-for="CreatedDate" class="form-control" readonly />
+						</div>
+
+						<!-- Modified Date -->
+						<div class="mb-2">
+							<label>Modified Date</label>
+							<input type="text" asp-for="ModifiedDate" class="form-control" readonly />
+						</div>
+					</div>
+
 					</div>
 					<div class="col-3">
 						<div class="mb-2">
@@ -41,11 +65,14 @@
 							<span asp-validation-for="Description" class="text-danger"></span>
 						</div>
 					</div>
-				</div>
-				<div class="mb-2">
-					<button type="submit" class="btn btn-primary w-100">Save</button>
-				</div>
-			</form>
+                <div class="mb-2">
+                    <button type="submit" class="btn btn-primary w-100">Save</button>
+                </div>
+
+			</form>	 
+			
+			 	
+			
 		</div>
 	</div>
 </div>

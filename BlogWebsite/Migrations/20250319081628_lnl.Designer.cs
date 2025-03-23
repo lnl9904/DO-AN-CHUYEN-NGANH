@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlogWebsite.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250315054559_lnl")]
+    [Migration("20250319081628_lnl")]
     partial class lnl
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -146,8 +146,20 @@ namespace BlogWebsite.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Download_path")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsPost")
+                        .HasColumnType("bit");
+
                     b.Property<int>("LikeCount")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Royalty")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Slug")
                         .HasColumnType("nvarchar(max)");
@@ -164,11 +176,19 @@ namespace BlogWebsite.Migrations
                     b.Property<int>("ViewCount")
                         .HasColumnType("int");
 
+                    b.Property<int>("WritingPhaseID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("WritingPhasesId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("TagId");
+
+                    b.HasIndex("WritingPhasesId");
 
                     b.ToTable("posts");
                 });
@@ -195,6 +215,43 @@ namespace BlogWebsite.Migrations
                     b.HasIndex("PostId");
 
                     b.ToTable("reactions");
+                });
+
+            modelBuilder.Entity("BlogWebsite.Models.RegistrationPeriods", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Is_Opening_registration")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("RegisDeadlineEnd")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("RegisDeadlineStart")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("RegisEnd")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("RegisStart")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("registrationPeriods");
                 });
 
             modelBuilder.Entity("BlogWebsite.Models.Setting", b =>
@@ -255,6 +312,48 @@ namespace BlogWebsite.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("topics");
+                });
+
+            modelBuilder.Entity("BlogWebsite.Models.WritingPhases", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("AmountArticles")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Is_Opening_registration")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RegistrationPeriodID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RegistrationPeriodsId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RegistrationPeriodsId");
+
+                    b.ToTable("writingPhases");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -533,9 +632,15 @@ namespace BlogWebsite.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("BlogWebsite.Models.WritingPhases", "WritingPhases")
+                        .WithMany("posts")
+                        .HasForeignKey("WritingPhasesId");
+
                     b.Navigation("ApplicationUsers");
 
                     b.Navigation("Tag");
+
+                    b.Navigation("WritingPhases");
                 });
 
             modelBuilder.Entity("BlogWebsite.Models.Reaction", b =>
@@ -545,6 +650,15 @@ namespace BlogWebsite.Migrations
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("BlogWebsite.Models.WritingPhases", b =>
+                {
+                    b.HasOne("BlogWebsite.Models.RegistrationPeriods", "RegistrationPeriods")
+                        .WithMany("WritingPhases")
+                        .HasForeignKey("RegistrationPeriodsId");
+
+                    b.Navigation("RegistrationPeriods");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -615,6 +729,11 @@ namespace BlogWebsite.Migrations
                     b.Navigation("Reactions");
                 });
 
+            modelBuilder.Entity("BlogWebsite.Models.RegistrationPeriods", b =>
+                {
+                    b.Navigation("WritingPhases");
+                });
+
             modelBuilder.Entity("BlogWebsite.Models.Tag", b =>
                 {
                     b.Navigation("posts");
@@ -623,6 +742,11 @@ namespace BlogWebsite.Migrations
             modelBuilder.Entity("BlogWebsite.Models.Topic", b =>
                 {
                     b.Navigation("ForumPosts");
+                });
+
+            modelBuilder.Entity("BlogWebsite.Models.WritingPhases", b =>
+                {
+                    b.Navigation("posts");
                 });
 #pragma warning restore 612, 618
         }

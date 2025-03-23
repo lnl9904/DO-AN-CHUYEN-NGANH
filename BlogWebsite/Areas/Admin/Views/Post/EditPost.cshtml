@@ -27,6 +27,14 @@
                             <datalist id="tags-list"></datalist>
                             <span asp-validation-for="TagName" class="text-danger"></span>
                         </div>
+                        <!-- ✅ Thêm phần chọn Writing Phase -->
+                        <div class="mb-2">
+                            <label>Writing Phase</label>
+                            <select asp-for="WritingPhaseID" asp-items="@(new SelectList(Model.WritingPhases, "Id", "Name"))" class="form-control">
+                                <option value="">-- Select Writing Phase --</option>
+                            </select>
+                            <span asp-validation-for="WritingPhaseID" class="text-danger"></span>
+                        </div>
                         <div class="mb-2">
                             <label>Description</label>
                             <textarea id="richEditor" asp-for="Description" class="form-control" rows="8"></textarea>
