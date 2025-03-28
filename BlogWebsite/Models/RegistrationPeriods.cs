@@ -11,6 +11,6 @@
         public DateTime RegisDeadlineStart { get; set; } // Hạn đợt Đăng Ký
         public DateTime RegisDeadlineEnd { get; set; }  // Hạn đợt Đăng Ký
         public bool Is_Opening_registration { get; set; }
-        public ICollection<WritingPhases>? WritingPhases { get; set; }
+        public ICollection<WritingPhase>? WritingPhases { get; set; }
     }
 }

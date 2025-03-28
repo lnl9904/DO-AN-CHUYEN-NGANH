@@ -5,7 +5,7 @@
 }
 
 <div class="container-fluid">
-	<a class="btn btn-dark mb-2 mt-2 asp-action="Index" asp-controller="Post" asp-area="Admin">Go Back</a>
+	<a class="btn btn-dark mb-2 mt-2" asp-action="Index" asp-controller="Post" asp-area="Admin">Go Back</a>
 	<div class="card">
 		<div class="card-header bg-dark">
 			<h4 class="card-title text-white">New Post</h4>
@@ -28,7 +28,7 @@
 						<!-- Writing Phase -->
 						<div class="mb-2">
 							<label>Writing Phase</label>
-							<select asp-for="WritingPhaseID" asp-items="@(new SelectList(Model.WritingPhases, "Id", "Name"))" class="form-control">
+							<select asp-for="WritingPhaseID" asp-items="@(new SelectList(Model.WritingPhases, "Id", "Title"))" class="form-control">
 								<option value="">-- Select Writing Phase --</option>
 							</select>
 							<span asp-validation-for="WritingPhaseID" class="text-danger"></span>
@@ -52,7 +52,17 @@
 							<label>Modified Date</label>
 							<input type="text" asp-for="ModifiedDate" class="form-control" readonly />
 						</div>
-					</div>
+
+						<!-- ✅ Thêm checkbox chọn trạng thái IsPost -->
+						<div class="mb-2">
+							<label>Post Status</label>
+							<div class="form-check">
+								<input class="form-check-input" type="checkbox" asp-for="IsPost" id="IsPost">
+								<label class="form-check-label" for="IsPost">
+									Published (Checked = Published, Unchecked = Draft)
+								</label>
+							</div>
+						</div>
 
 					</div>
 					<div class="col-3">
@@ -62,22 +72,21 @@
 						<div class="mb-2">
 							<label>Thumbnail</label>
 							<input type="file" asp-for="Thumbnail" class="custom-file" />
-							<span asp-validation-for="Description" class="text-danger"></span>
+							<span asp-validation-for="Thumbnail" class="text-danger"></span>
 						</div>
 					</div>
-                <div class="mb-2">
-                    <button type="submit" class="btn btn-primary w-100">Save</button>
-                </div>
-
-			</form>	 
-			
-			 	
-			
+				</div>
+				<div class="mb-2">
+					<button type="submit" class="btn btn-primary w-100">Save</button>
+				</div>
+			</form>
 		</div>
 	</div>
 </div>
-@section Scripts{
+
+@section Scripts {
 	<partial name="_ValidationScriptsPartial" />
+
 	<script>
 		$(".custom-file").on("change", function () {
 			var fileName = $(this).val().split("\\").pop();
@@ -85,11 +94,12 @@
 			document.getElementById('thumbnail').src = window.URL.createObjectURL(this.files[0])
 		});
 	</script>
+
 	<script>
 		$(document).ready(function () {
 			$("#tags").keyup(function () {
 				var input = $(this).val();
-				if (input.length >= 1) { // Kiểm tra nếu có ít nhất 2 ký tự được nhập
+				if (input.length >= 1) { // Kiểm tra nếu có ít nhất 1 ký tự được nhập
 					$.ajax({
 						url: "/Admin/Post/AutocompleteTags", // Địa chỉ URL xử lý autocomplete
 						type: "GET",

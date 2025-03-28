@@ -20,6 +20,6 @@ namespace BlogWebsite.Data
 		public DbSet<Setting>? settings { get; set; }
 		public DbSet<Reaction>? reactions { get; set; }
 		public DbSet<RegistrationPeriods>? registrationPeriods { get; set; }
-		public DbSet<WritingPhases>? writingPhases { get; set; }
+		public DbSet<WritingPhase>? writingPhases { get; set; }
 	}
 }

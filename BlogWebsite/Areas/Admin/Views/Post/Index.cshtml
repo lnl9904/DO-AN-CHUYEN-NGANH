@@ -1,103 +1,201 @@
 ﻿@using X.PagedList;
-@using X.PagedList.Mvc.Core
-@using X.PagedList.Web.Common
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Web.Common;
 @model IPagedList<BlogWebsite.ViewModels.PostVM>
 
 @{
-	ViewData["Title"] = "List of Posts";
+    ViewData["Title"] = "List of Posts";
 }
 <div class="container-fluid">
-	<a class="btn btn-dark mb-2 mt-2" asp-action="CreatePost" asp-controller="Post" asp-area="Admin">Add Post</a>
-	<div class="card">
-		<div class="card-header bg-dark">
-			<h4 class="card-title text-white">List of Posts</h4>
-			<form asp-area="Admin" asp-controller="Post" asp-action="Index" method="get" class="input-group px-lg-1 py-2 py-lg-3">
-				<div class="form-outline">
-					<input id="search-input" name="keyword" type="search" placeholder="Search..." class="form-control form-control-sm box-shadow" style="border-bottom-left-radius:30px;border-top-left-radius:30px;" />
-				</div>
-				<button type="submit" class="btn btn-sm btn-secondary" style="border-bottom-right-radius:30px;border-top-right-radius:30px;" aria-label="Search">
-					<i class="fa-solid fa-magnifying-glass" style="color: #ffffff;" aria-hidden="true"></i>
-				</button>
+    <a class="btn btn-dark mb-2 mt-2" asp-action="CreatePost" asp-controller="Post" asp-area="Admin">Add Post</a>
+    <div class="card">
+        <div class="card-header bg-dark">
+            <h4 class="card-title text-white">List of Posts</h4>
+            <form asp-area="Admin" asp-controller="Post" asp-action="Index" method="get" class="input-group px-lg-1 py-2 py-lg-3">
+                <div class="form-outline">
+                    <input id="search-input" name="keyword" type="search" placeholder="Search..." value="@ViewBag.CurrentFilter" class="form-control form-control-sm box-shadow" style="border-bottom-left-radius:30px;border-top-left-radius:30px;" />
+                </div>
+                <!-- Bộ lọc trạng thái bài viết -->
+                <select name="isPost" class="form-control mx-2">
+                    <option value="">-- All Statuses --</option>
+                    <option value="true" selected="@(ViewBag.CurrentStatus == true)">Đã Đăng</option>
+                    <option value="false" selected="@(ViewBag.CurrentStatus == false)">Chưa Đăng</option>
+                </select>
+                <button type="submit" class="btn btn-sm btn-secondary" style="border-bottom-right-radius:30px;border-top-right-radius:30px;" aria-label="Search">
+                    <i class="fa-solid fa-magnifying-glass" style="color: #ffffff;" aria-hidden="true"></i>
+                </button>
+            </form>
+        </div>
+        <div class="card-body" style="background-color:lightgray;">
+            @foreach (var posts in Model!)
+            {
+                <div class="rounded mb-4 bg-white p-1">
+                    <div class="row">
+                        <div class="col-4">
+                            <a asp-area="Admin" asp-action="EditPost" asp-controller="Post" asp-route-id="@posts.Id" method="post" style="text-decoration:none;">
+                                @if (posts.ThumbnailUrl == null)
 
-			</form>
-		</div>
-		<div class="card-body" style="background-color:lightgray;">
-			@foreach (var posts in Model!)
-			{
-				<div class="rounded mb-4 bg-white p-1">
-					<div class="row">
-						<div class="col-4">
-							<a asp-area="Admin" asp-action="EditPost" asp-controller="Post" asp-route-id="@posts.Id" method="post" style="text-decoration:none;">
-								@if (posts.ThumbnailUrl == null)
-								{
-									<img class="img-fluid" alt="@posts.Title" src="~/thumbnails/default_image.webp" style="object-fit:cover; height: 100%; width:100%;">
-								}
-								else
-								{
-									<img class="img-fluid" alt="@posts.Title" src="~/thumbnails/@posts.ThumbnailUrl" style="object-fit:cover; height: 100%; width:100%;">
+                                {
+                                    <img class="img-fluid" alt="@posts.Title" src="~/thumbnails/default_image.webp" style="object-fit:cover; height: 100%; width:100%;">
+                                }
 
-								}
-							</a>
-						</div>
-						<div class="col-4">
-							<a asp-area="Admin" asp-action="EditPost" asp-controller="Post" asp-route-id="@posts.Id" method="post">
-								<h4 style="font-size:25px; font-weight: bolder;" class="text-primary fw-bold">@posts.Title</h4>
-							</a>
-							@if (!string.IsNullOrEmpty(posts.TagName))
-							{
-								<button type="button" class="btn btn-secondary">
-									@posts.TagName
-								</button>
-							}
-							else
-							{
-								<button type="button" class="btn btn-secondary">
-									None Tag
-								</button>
-							}
+                                else
 
-							<p>@posts.AuthorName</p>
-							<p>@posts.CreateDate</p>
-							<p><i class="fa-solid fa-eye"></i> @posts.ViewCount</p>
-							<p><i class="fa-regular fa-heart fa"></i> @posts.LikeCount</p>
-						</div>
-						<div class="col-4 text-right d-flex justify-content-center flex-column">
-							<div class="d-flex justify-content-end">
-								<form asp-area="Admin" asp-action="DeletePost" asp-controller="Post" asp-route-id="@posts.Id" method="post" onsubmit="return confirm('Do you want to delete this post?')">
-									<button type="submit" class="btn btn-danger btn-sm">Delete</button>
-								</form>
-							</div>
-						</div>
-					</div>
+                                {
+                                    <img class="img-fluid" alt="@posts.Title" src="~/thumbnails/@posts.ThumbnailUrl" style="object-fit:cover; height: 100%; width:100%;">
+                                }
+                            </a>
+                        </div>
+                        <div class="col-4">
+                            <a asp-area="Admin" asp-action="EditPost" asp-controller="Post" asp-route-id="@posts.Id" method="post">
+                                <h4 style="font-size:25px; font-weight: bolder;" class="text-primary fw-bold">@posts.Title</h4>
+                            </a>
+                            @if (!string.IsNullOrEmpty(posts.TagName))
 
-				</div>
-			}
-		</div>
-		<!-- Pagination -->
-		<div class="d-flex justify-content-center my-4">
-			<nav aria-label="Page navigation">
-				<ul class="pagination">
-					<li class="page-item @((Model?.HasPreviousPage == false) ? "disabled" : "")">
-						<a class="page-link" href="@Url.Action("Index", new { page = Model?.PageNumber - 1, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter })" aria-label="Previous">
-							<span aria-hidden="true">&laquo;</span>
-							<span class="sr-only">Previous</span>
-						</a>
-					</li>
-					@for (var i = 1; i <= Model?.PageCount; i++)
-					{
-						<li class="page-item @(i == Model?.PageNumber ? "active" : "")">
-							<a class="page-link" href="@Url.Action("Index", new { page = i, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter })">@i</a>
-						</li>
-					}
-					<li class="page-item @((Model?.HasNextPage == false) ? "disabled" : "")">
-						<a class="page-link" href="@Url.Action("Index", new { page = Model?.PageNumber + 1, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter })" aria-label="Next">
-							<span aria-hidden="true">&raquo;</span>
-							<span class="sr-only">Next</span>
-						</a>
-					</li>
-				</ul>
-			</nav>
-		</div>
+                            {
+                                <button type="button" class="btn btn-secondary">
+                                    @posts.TagName
+                                </button>
+                            }
 
-	</div>
+                            else
+
+                            {
+                                <button type="button" class="btn btn-secondary">
+                                    None Tag
+                                </button>
+                            }
+                            <p>@posts.AuthorName</p>
+                            <p>Create Date: @posts.CreateDate.ToString("yyyy-MM-dd")</p>
+                            <p>Modified Date: @posts.ModifiedDate.ToString("yyyy-MM-dd")</p>
+                            <p>Writing Phase: @posts.WritingPhases</p>
+                            <p><i class="fa-solid fa-eye"></i> @posts.ViewCount</p>
+                            <p><i class="fa-regular fa-heart"></i> @posts.LikeCount</p>
+                            <!-- Hiển thị trạng thái IsPost -->
+                            <p>
+                                Status:
+                                <span id="postStatus_@posts.Id" class="badge @(posts.IsPost ? "bg-success" : "bg-warning")">
+                                    @(posts.IsPost ? "Đã Đăng" : "Chưa Đăng")
+                                </span>
+                            </p>
+                            <!-- Nút Toggle Status -->
+                            <p>
+                                <button class="btn btn-sm toggle-status @(posts.IsPost ? "btn-danger" : "btn-success")"
+                                        data-id="@posts.Id"
+                                        data-status="@posts.IsPost">
+                                    @(posts.IsPost ? "Gỡ Bài" : "Đăng Bài")
+                                </button>
+                            </p>
+                        </div>
+                        <div class="col-4 text-right d-flex justify-content-center flex-column">
+                            <div class="d-flex justify-content-end">
+                                <!-- Nút Edit và Delete nằm cạnh nhau -->
+                                <button type="button" class="btn btn-sm btn-info me-2" onclick="location.href='@Url.Action("EditPost", "Post", new { area = "Admin", id = posts.Id })'">
+                                    Edit
+                                </button>
+                                <form asp-area="Admin" asp-action="DeletePost" asp-controller="Post" asp-route-id="@posts.Id" method="post" onsubmit="return confirm('Do you want to delete this post?')" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <!-- Phân trang giữ lại bộ lọc keyword và isPost -->
+        <div class="d-flex justify-content-center my-4">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <li class="page-item @((Model?.HasPreviousPage == false) ? "disabled" : "")">
+                        <a class="page-link" href="@Url.Action("Index", new { page = Model?.PageNumber - 1, keyword = ViewBag.CurrentFilter, isPost = ViewBag.CurrentStatus })" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                    </li>
+                    @for (var i = 1; i <= Model?.PageCount; i++)
+
+                    {
+                        <li class="page-item @(i == Model?.PageNumber ? "active" : "")">
+                            <a class="page-link" href="@Url.Action("Index", new { page = i, keyword = ViewBag.CurrentFilter, isPost = ViewBag.CurrentStatus })">@i</a>
+                        </li>
+                    }
+                    <li class="page-item @((Model?.HasNextPage == false) ? "disabled" : "")">
+                        <a class="page-link" href="@Url.Action("Index", new { page = Model?.PageNumber + 1, keyword = ViewBag.CurrentFilter, isPost = ViewBag.CurrentStatus })" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <!-- Đảm bảo jQuery được load trước -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Nếu cần, load Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- ToastNotification (chỉnh sửa đường dẫn không có khoảng trắng) -->
+    <link rel="stylesheet" href="~/_content/AspNetCoreHero.ToastNotification/notyf.min.css" />
+    <script src="~/_content/AspNetCoreHero.ToastNotification/notyf.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $(".toggle-status").click(function () {
+                var button = $(this);
+                var postId = button.data("id");
+
+                $.ajax({
+                    url: "/Admin/Post/TogglePostStatus",
+                    type: "POST",
+                    data: JSON.stringify(postId),  // Chỉ gửi số, không cần { id: postId }
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+                        if (response.success) {
+                            var statusBadge = $("#postStatus_" + postId);
+                            if (response.newStatus) {
+                                statusBadge.removeClass("bg-warning").addClass("bg-success").text("Đã Đăng");
+                                button.removeClass("btn-success").addClass("btn-danger").text("Gỡ Bài");
+                            } else {
+                                statusBadge.removeClass("bg-success").addClass("bg-warning").text("Chưa Đăng");
+                                button.removeClass("btn-danger").addClass("btn-success").text("Đăng Bài");
+                            }
+                            button.data("status", response.newStatus);
+                        } else {
+                            alert("Cập nhật trạng thái thất bại!");
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(xhr.responseText);
+                        alert("Lỗi khi cập nhật trạng thái!");
+                    }
+                });
+
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $("#tags").keyup(function () {
+                var input = $(this).val();
+                if (input.length >= 1) { // Kiểm tra nếu có ít nhất 1 ký tự được nhập
+                    $.ajax({
+                        url: "/Admin/Post/AutocompleteTags",
+                        type: "GET",
+                        data: { keyword: input },
+                        success: function (data) {
+                            $("#tags-list").empty();
+                            $.each(data, function (index, value) {
+                                $("#tags-list").append('<option value="' + value + '"></option>');
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

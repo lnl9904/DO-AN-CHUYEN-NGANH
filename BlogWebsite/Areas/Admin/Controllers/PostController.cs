@@ -14,7 +14,8 @@ namespace BlogWebsite.Areas.Admin.Controllers
 {
 	[Area("Admin")]
 	[Authorize]
-	public class PostController : Controller
+    [Route("Admin/Post")]
+    public class PostController : Controller
 	{
 		private readonly ApplicationDbContext _context;
 		public INotyfService _notification { get; }
@@ -35,7 +36,7 @@ namespace BlogWebsite.Areas.Admin.Controllers
 		}
 
 		[HttpGet("Post")]
-		public async Task<IActionResult> Index(string keyword, int? page)
+		public async Task<IActionResult> Index(string? keyword, bool? isPost, int? page)
 		{
 			int pageNumber = page ?? 1;
 			int pageSize = 4;
@@ -53,11 +54,21 @@ namespace BlogWebsite.Areas.Admin.Controllers
 					TagName = x.Tag != null ? x.Tag.Name : "None Tag",
 					ViewCount = x.ViewCount,
 					CreateDate = x.CreatedDate,
+					ModifiedDate = x.ModifiedDate,
 					ThumbnailUrl = x.ThumbnailUrl,
+					WritingPhases = x.WritingPhases != null ? x.WritingPhases.Title : "N/A",
 					AuthorName = x.ApplicationUsers != null ? x.ApplicationUsers.FirstName + " " + x.ApplicationUsers.LastName : "Unknown Author",
-					LikeCount = x.LikeCount
+					LikeCount = x.LikeCount,
+					IsPost = x.IsPost // ✅ Đổi từ IsPublished sang IsPost
 				});
 
+			// ✅ Lọc theo trạng thái IsPost
+			if (isPost.HasValue)
+			{
+				postsQuery = postsQuery.Where(x => x.IsPost == isPost.Value);
+			}
+
+			// ✅ Lọc theo từ khóa tìm kiếm
 			if (!string.IsNullOrEmpty(keyword))
 			{
 				keyword = keyword.ToLower();
@@ -66,20 +77,23 @@ namespace BlogWebsite.Areas.Admin.Controllers
 
 			var listPost_Page = await postsQuery.ToPagedListAsync(pageNumber, pageSize);
 
+			ViewBag.CurrentFilter = keyword;
+			ViewBag.CurrentStatus = isPost; // ✅ Lưu trạng thái để hiển thị lại trên UI
+
 			return View(listPost_Page);
 		}
 
-		
-        [HttpGet("CreatePost")]
+
+
+		[HttpGet("CreatePost")]
         public async Task<IActionResult> CreatePost()
         {
             var model = new CreatPostVM
             {
                 WritingPhases = await _context.writingPhases!.ToListAsync()
             };
-            return View(new CreatPostVM());
+            return View(model);
         }
-
         [HttpPost("CreatePost")]
         public async Task<IActionResult> CreatePost(CreatPostVM vm)
         {
@@ -95,7 +109,6 @@ namespace BlogWebsite.Areas.Admin.Controllers
 
             if (tag == null)
             {
-                // Nếu tag chưa tồn tại, tạo mới tag trước khi tạo post
                 tag = new Tag
                 {
                     Name = vm.TagName!.ToUpper()
@@ -113,14 +126,14 @@ namespace BlogWebsite.Areas.Admin.Controllers
                 ModifiedDate = DateTime.Now,
                 Description = vm.Description,
                 TagId = tag!.Id,
-                ApplicationUserId = loggedInUser!.Id
+                ApplicationUserId = loggedInUser!.Id,
+                IsPost = vm.IsPost // ✅ Thêm trạng thái IsPost
             };
 
-            if (post.Title != null)
+            if (!string.IsNullOrEmpty(vm.Title))
             {
                 var slugHelper = new SlugHelper();
-                string slug = slugHelper.GenerateSlug(vm.Title!.Trim());
-
+                string slug = slugHelper.GenerateSlug(vm.Title.Trim());
                 post.Slug = slug + "-" + Guid.NewGuid();
             }
 
@@ -134,6 +147,7 @@ namespace BlogWebsite.Areas.Admin.Controllers
             _notification.Success("Post Created Successfully!");
             return RedirectToAction("Index");
         }
+
 
         [HttpPost]
 		public async Task<IActionResult> DeletePost(int id)
@@ -156,7 +170,6 @@ namespace BlogWebsite.Areas.Admin.Controllers
 				return RedirectToAction("Index", "Post", new { area = "Admin" });
 			}
 		}
-
         [HttpGet("EditPost")]
         public async Task<IActionResult> EditPost(int id)
         {
@@ -188,6 +201,7 @@ namespace BlogWebsite.Areas.Admin.Controllers
                 ModifiedDate = DateTime.Now, // Cập nhật ngày sửa đổi
                 Description = post.Description,
                 ThumbnailUrl = post.ThumbnailUrl,
+                IsPost = post.IsPost, // ✅ Thêm trạng thái IsPost
 
                 // ✅ Thêm danh sách WritingPhases
                 WritingPhases = await _context.writingPhases!.ToListAsync()
@@ -195,7 +209,6 @@ namespace BlogWebsite.Areas.Admin.Controllers
 
             return View(vm);
         }
-
 
         [HttpPost("EditPost")]
         public async Task<IActionResult> EditPost(CreatPostVM vm)
@@ -230,6 +243,7 @@ namespace BlogWebsite.Areas.Admin.Controllers
             post.Description = vm.Description;
             post.WritingPhaseID = vm.WritingPhaseID; // ✅ Cập nhật WritingPhaseID
             post.ModifiedDate = DateTime.Now; // ✅ Cập nhật thời gian sửa đổi
+            post.IsPost = vm.IsPost; // ✅ Cập nhật trạng thái IsPost
 
             if (vm.Thumbnail != null)
             {
@@ -239,6 +253,20 @@ namespace BlogWebsite.Areas.Admin.Controllers
             await _context.SaveChangesAsync();
             _notification.Success("Post Updated Successfully!");
             return RedirectToAction("Index", "Post", new { area = "Admin" });
+        }
+
+        [HttpPost("TogglePostStatus")]
+        public async Task<IActionResult> TogglePostStatus([FromBody] int id)
+        {
+            var post = await _context.posts!.FindAsync(id);
+            if (post == null)
+            {
+                return Json(new { success = false });
+            }
+            post.IsPost = !post.IsPost;
+            post.ModifiedDate = DateTime.Now;
+            await _context.SaveChangesAsync();
+            return Json(new { success = true, newStatus = post.IsPost });
         }
 
 
