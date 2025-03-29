@@ -14,7 +14,8 @@ namespace BlogWebsite.Areas.Admin.Controllers
 {
 	[Area("Admin")]
 	[Authorize]
-	public class PostController : Controller
+    [Route("Admin/Post")]
+    public class PostController : Controller
 	{
 		private readonly ApplicationDbContext _context;
 		public INotyfService _notification { get; }
@@ -35,7 +36,7 @@ namespace BlogWebsite.Areas.Admin.Controllers
 		}
 
 		[HttpGet("Post")]
-		public async Task<IActionResult> Index(string keyword, int? page)
+		public async Task<IActionResult> Index(string? keyword, bool? isPost, int? page)
 		{
 			int pageNumber = page ?? 1;
 			int pageSize = 4;
@@ -53,11 +54,21 @@ namespace BlogWebsite.Areas.Admin.Controllers
 					TagName = x.Tag != null ? x.Tag.Name : "None Tag",
 					ViewCount = x.ViewCount,
 					CreateDate = x.CreatedDate,
+					ModifiedDate = x.ModifiedDate,
 					ThumbnailUrl = x.ThumbnailUrl,
+					WritingPhases = x.WritingPhases != null ? x.WritingPhases.Title : "N/A",
 					AuthorName = x.ApplicationUsers != null ? x.ApplicationUsers.FirstName + " " + x.ApplicationUsers.LastName : "Unknown Author",
-					LikeCount = x.LikeCount
+					LikeCount = x.LikeCount,
+					IsPost = x.IsPost // ✅ Đổi từ IsPublished sang IsPost
 				});
 
+			// ✅ Lọc theo trạng thái IsPost
+			if (isPost.HasValue)
+			{
+				postsQuery = postsQuery.Where(x => x.IsPost == isPost.Value);
+			}
+
+			// ✅ Lọc theo từ khóa tìm kiếm
 			if (!string.IsNullOrEmpty(keyword))
 			{
 				keyword = keyword.ToLower();
@@ -66,77 +77,79 @@ namespace BlogWebsite.Areas.Admin.Controllers
 
 			var listPost_Page = await postsQuery.ToPagedListAsync(pageNumber, pageSize);
 
+			ViewBag.CurrentFilter = keyword;
+			ViewBag.CurrentStatus = isPost; // ✅ Lưu trạng thái để hiển thị lại trên UI
+
 			return View(listPost_Page);
 		}
 
+
+
 		[HttpGet("CreatePost")]
-		public IActionResult CreatePost()
-		{
-			return View(new CreatPostVM());
-		}
+        public async Task<IActionResult> CreatePost()
+        {
+            var model = new CreatPostVM
+            {
+                WritingPhases = await _context.writingPhases!.ToListAsync()
+            };
+            return View(model);
+        }
+        [HttpPost("CreatePost")]
+        public async Task<IActionResult> CreatePost(CreatPostVM vm)
+        {
+            if (!ModelState.IsValid)
+            {
+                // Lấy danh sách WritingPhases từ database để hiển thị lại form nếu có lỗi
+                vm.WritingPhases = await _context.writingPhases!.ToListAsync();
+                return View(vm);
+            }
 
-		[HttpPost("CreatePost")]
-		public async Task<IActionResult> CreatePost(CreatPostVM vm)
-		{
-			if (!ModelState.IsValid)
-			{
-				return View(vm);
-			}
+            var loggedInUser = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == User.Identity!.Name);
+            var tag = await _context.tags!.FirstOrDefaultAsync(t => t.Name == vm.TagName);
 
-			var loggedInUser = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == User.Identity!.Name);
-			var tag = await _context.tags!.FirstOrDefaultAsync(t => t.Name == vm.TagName);
+            if (tag == null)
+            {
+                tag = new Tag
+                {
+                    Name = vm.TagName!.ToUpper()
+                };
 
-			if (tag == null)
-			{
-				// Nếu tag chưa tồn tại, tạo mới tag trước khi tạo post
-				tag = new Tag
-				{
-					Name = vm.TagName!.ToUpper()
-				};
+                _context.tags!.Add(tag);
+                await _context.SaveChangesAsync();
+            }
 
-				_context.tags!.Add(tag);
-				await _context.SaveChangesAsync();
-			}
+            var post = new Post
+            {
+                Title = vm.Title,
+                WritingPhaseID = vm.WritingPhaseID,
+                CreatedDate = DateTime.Now,
+                ModifiedDate = DateTime.Now,
+                Description = vm.Description,
+                TagId = tag!.Id,
+                ApplicationUserId = loggedInUser!.Id,
+                IsPost = vm.IsPost // ✅ Thêm trạng thái IsPost
+            };
 
-			var post = new Post
-			{
-				Title = vm.Title,
-				Description = vm.Description,
-				TagId = tag!.Id,
-				ApplicationUserId = loggedInUser!.Id
-			};
+            if (!string.IsNullOrEmpty(vm.Title))
+            {
+                var slugHelper = new SlugHelper();
+                string slug = slugHelper.GenerateSlug(vm.Title.Trim());
+                post.Slug = slug + "-" + Guid.NewGuid();
+            }
 
-			if (tag == null)
-			{
-				tag = new Tag
-				{
-					Name = vm.TagName
-				};
+            if (vm.Thumbnail != null)
+            {
+                post.ThumbnailUrl = UploadImage(vm.Thumbnail);
+            }
 
-				_context.tags!.Add(tag);
-				await _context.SaveChangesAsync();
-			}
+            _context.posts!.Add(post);
+            await _context.SaveChangesAsync();
+            _notification.Success("Post Created Successfully!");
+            return RedirectToAction("Index");
+        }
 
-			if (post.Title != null)
-			{
-				var slugHelper = new SlugHelper();
-				string slug = slugHelper.GenerateSlug(vm.Title!.Trim());
 
-				post.Slug = slug + "-" + Guid.NewGuid();
-			}
-
-			if (vm.Thumbnail != null)
-			{
-				post.ThumbnailUrl = UploadImage(vm.Thumbnail);
-			}
-
-			_context.posts!.Add(post);
-			await _context.SaveChangesAsync();
-			_notification.Success("Post Created Successfully!");
-			return RedirectToAction("Index");
-		}
-
-		[HttpPost]
+        [HttpPost]
 		public async Task<IActionResult> DeletePost(int id)
 		{
 			var post = await _context.posts!.Include(x => x.Comments).SingleOrDefaultAsync(x => x.Id == id);
@@ -157,78 +170,107 @@ namespace BlogWebsite.Areas.Admin.Controllers
 				return RedirectToAction("Index", "Post", new { area = "Admin" });
 			}
 		}
+        [HttpGet("EditPost")]
+        public async Task<IActionResult> EditPost(int id)
+        {
+            var post = await _context.posts!
+                .Include(p => p.Tag)
+                .SingleOrDefaultAsync(x => x.Id == id);
 
-		[HttpGet("EditPost")]
-		public async Task<IActionResult> EditPost(int id)
-		{
-			var post = await _context.posts!
-				.Include(p => p.Tag)
-				.SingleOrDefaultAsync(x => x.Id == id);
+            if (post == null)
+            {
+                _notification.Error("Post not found!");
+                return View();
+            }
 
-			if (post == null)
-			{
-				_notification.Error("Post not found!");
-				return View();
-			}
+            var loggedInUser = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == User.Identity!.Name);
+            var loggedInUserRole = await _userManager.GetRolesAsync(loggedInUser!);
+            if (loggedInUserRole[0] != WebsiteRole.WebisteAdmin && loggedInUser!.Id != post.ApplicationUserId)
+            {
+                _notification.Error("You Are Not Author Of This Post!");
+                return RedirectToAction("Index");
+            }
 
-			var loggedInUser = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == User.Identity!.Name);
-			var loggedInUserRole = await _userManager.GetRolesAsync(loggedInUser!);
-			if (loggedInUserRole[0] != WebsiteRole.WebisteAdmin && loggedInUser!.Id != post.ApplicationUserId)
-			{
-				_notification.Error("You Are Not Author Of This Post!");
-				return RedirectToAction("Index");
-			}
+            var vm = new CreatPostVM()
+            {
+                Id = post.Id,
+                Title = post.Title,
+                TagName = post.Tag != null ? post.Tag.Name : "",
+                WritingPhaseID = post.WritingPhaseID,
+                CreatedDate = post.CreatedDate, // Giữ nguyên ngày tạo cũ
+                ModifiedDate = DateTime.Now, // Cập nhật ngày sửa đổi
+                Description = post.Description,
+                ThumbnailUrl = post.ThumbnailUrl,
+                IsPost = post.IsPost, // ✅ Thêm trạng thái IsPost
 
-			var vm = new CreatPostVM()
-			{
-				Id = post.Id,
-				Title = post.Title,
-				TagName = post.Tag != null ? post.Tag.Name : "",
-				Description = post.Description,
-				ThumbnailUrl = post.ThumbnailUrl
-			};
+                // ✅ Thêm danh sách WritingPhases
+                WritingPhases = await _context.writingPhases!.ToListAsync()
+            };
 
-			return View(vm);
-		}
+            return View(vm);
+        }
 
-		[HttpPost("EditPost")]
-		public async Task<IActionResult> EditPost(CreatPostVM vm)
-		{
-			if (!ModelState.IsValid) { return View(vm); }
-			var post = await _context.posts!.SingleOrDefaultAsync(x => x.Id == vm.Id);
-			var tag = await _context.tags!.SingleOrDefaultAsync(t => t.Name == vm.TagName);
-			if (post == null)
-			{
-				_notification.Error("Post not found!");
-				return View();
-			}
+        [HttpPost("EditPost")]
+        public async Task<IActionResult> EditPost(CreatPostVM vm)
+        {
+            if (!ModelState.IsValid)
+            {
+                // ✅ Load lại danh sách WritingPhases để hiển thị trong View
+                vm.WritingPhases = await _context.writingPhases!.ToListAsync();
+                return View(vm);
+            }
 
-			if (tag == null)
-			{
-				tag = new Tag()
-				{
-					Name = vm.TagName!.ToUpper()
-				};
-				_context.tags!.Add(tag);
-				await _context.SaveChangesAsync();
-			}
+            var post = await _context.posts!.SingleOrDefaultAsync(x => x.Id == vm.Id);
+            var tag = await _context.tags!.SingleOrDefaultAsync(t => t.Name == vm.TagName);
+            if (post == null)
+            {
+                _notification.Error("Post not found!");
+                return View();
+            }
 
-			post.Title = vm.Title;
-			post.Tag = tag;
-			post.Description = vm.Description;
+            if (tag == null)
+            {
+                tag = new Tag()
+                {
+                    Name = vm.TagName!.ToUpper()
+                };
+                _context.tags!.Add(tag);
+                await _context.SaveChangesAsync();
+            }
 
-			if (vm.Thumbnail != null)
-			{
-				post.ThumbnailUrl = UploadImage(vm.Thumbnail!);
-			}
+            post.Title = vm.Title;
+            post.Tag = tag;
+            post.Description = vm.Description;
+            post.WritingPhaseID = vm.WritingPhaseID; // ✅ Cập nhật WritingPhaseID
+            post.ModifiedDate = DateTime.Now; // ✅ Cập nhật thời gian sửa đổi
+            post.IsPost = vm.IsPost; // ✅ Cập nhật trạng thái IsPost
 
-			await _context.SaveChangesAsync();
-			_notification.Success("Post Updated Successfully!");
-			return RedirectToAction("Index", "Post", new { area = "Admin" });
+            if (vm.Thumbnail != null)
+            {
+                post.ThumbnailUrl = UploadImage(vm.Thumbnail!);
+            }
 
-		}
+            await _context.SaveChangesAsync();
+            _notification.Success("Post Updated Successfully!");
+            return RedirectToAction("Index", "Post", new { area = "Admin" });
+        }
 
-		[HttpGet]
+        [HttpPost("TogglePostStatus")]
+        public async Task<IActionResult> TogglePostStatus([FromBody] int id)
+        {
+            var post = await _context.posts!.FindAsync(id);
+            if (post == null)
+            {
+                return Json(new { success = false });
+            }
+            post.IsPost = !post.IsPost;
+            post.ModifiedDate = DateTime.Now;
+            await _context.SaveChangesAsync();
+            return Json(new { success = true, newStatus = post.IsPost });
+        }
+
+
+        [HttpGet]
 		public IActionResult AutocompleteTags(string keyword)
 		{
 			var tags = _context.tags!

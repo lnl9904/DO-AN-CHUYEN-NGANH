@@ -3,10 +3,9 @@
 @{
     ViewData["Title"] = "Edit Post";
 }
-
 <div class="container-fluid">
     <a class="btn btn-dark mb-2 mt-2" asp-action="Index" asp-controller="Post" asp-area="Admin">Go Back</a>
-    <div class="card"> 
+    <div class="card">
         <div class="card-header bg-dark">
             <h4 class="card-title text-white">Edit Post</h4>
         </div>
@@ -14,6 +13,7 @@
             <form asp-action="EditPost" asp-controller="Post" asp-area="Admin" enctype="multipart/form-data">
                 <input type="hidden" asp-for="Id" />
                 <input type="hidden" asp-for="ThumbnailUrl" />
+                <input type="hidden" asp-for="IsPost" id="IsPostInput" />
                 <div class="row mb-2">
                     <div class="col-9">
                         <div class="mb-2">
@@ -27,19 +27,54 @@
                             <datalist id="tags-list"></datalist>
                             <span asp-validation-for="TagName" class="text-danger"></span>
                         </div>
+                        <!-- Writing Phase -->
+                        <div class="mb-2">
+                            <label>Writing Phase</label>
+                            <select asp-for="WritingPhaseID"
+                                    asp-items="@(new SelectList(Model.WritingPhases ?? new List<BlogWebsite.Models.WritingPhase>(), "Id", "Title"))"
+                                    class="form-control">
+                                <option value="">-- Select Writing Phase --</option>
+                            </select>
+                            <span asp-validation-for="WritingPhaseID" class="text-danger"></span>
+                        </div>
                         <div class="mb-2">
                             <label>Description</label>
                             <textarea id="richEditor" asp-for="Description" class="form-control" rows="8"></textarea>
                             <span asp-validation-for="Description" class="text-danger"></span>
                         </div>
-                    </div>  
+                        <!-- Post Status Toggle -->
+                        <div class="mb-2">
+                            <label>Post Status</label>
+                            <div class="d-flex align-items-center">
+                                <span id="postStatusBadge" class="badge @(Model.IsPost ? "bg-success" : "bg-warning") me-2">
+                                    @(Model.IsPost ? "Đã Đăng" : "Chưa Đăng")
+                                </span>
+                                <button type="button" class="btn btn-sm btn-info" id="toggleStatusBtn">
+                                    Change Status
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Created Date -->
+                        <div class="mb-2">
+                            <label>Created Date</label>
+                            <input type="text" asp-for="CreatedDate" class="form-control" readonly />
+                        </div>
+                        <!-- Modified Date -->
+                        <div class="mb-2">
+                            <label>Modified Date</label>
+                            <input type="text" asp-for="ModifiedDate" class="form-control" readonly />
+                        </div>
+                    </div>
                     <div class="col-3">
                         <div class="mb-2">
                             @if (Model.ThumbnailUrl == null)
+
                             {
                                 <img src="~/thumbnails/default_image.webp" class="img-fluid" id="thumbnail" />
                             }
+
                             else
+
                             {
                                 <img src="~/thumbnails/@Model.ThumbnailUrl" class="img-fluid" id="thumbnail" />
                             }
@@ -47,7 +82,7 @@
                         <div class="mb-2">
                             <label>Thumbnail</label>
                             <input type="file" asp-for="Thumbnail" class="custom-file" />
-                            <span asp-validation-for="Description" class="text-danger"></span>
+                            <span asp-validation-for="Thumbnail" class="text-danger"></span>
                         </div>
                     </div>
                 </div>
@@ -61,18 +96,44 @@
 
 @section Scripts{
     <partial name="_ValidationScriptsPartial" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <script>
         $(".custom-file").on("change", function () {
             var fileName = $(this).val().split("\\").pop();
             $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
             document.getElementById('thumbnail').src = window.URL.createObjectURL(this.files[0])
         });
+
+        $(document).ready(function () {
+            // Cập nhật giá trị ban đầu của hidden input IsPost
+            var initialStatus = @Model.IsPost.ToString().ToLower();
+            $("#IsPostInput").val(initialStatus);
+
+            // Xử lý nút Toggle Status
+            $("#toggleStatusBtn").click(function () {
+                // Lấy trạng thái hiện tại từ hidden input
+                var currentStatus = $("#IsPostInput").val() === "true";
+                // Đảo ngược trạng thái
+                var newStatus = !currentStatus;
+                // Cập nhật hidden input
+                $("#IsPostInput").val(newStatus);
+                // Cập
+              nhật badge hiển thị
+                var badge = $("#postStatusBadge");
+                if (newStatus) {
+                    badge.removeClass("bg-warning").addClass("bg-success").text("Đã Đăng");
+                } else {
+                    badge.removeClass("bg-success").addClass("bg-warning").text("Chưa Đăng");
+                }
+            });
+        });
     </script>
     <script>
         $(document).ready(function () {
             $("#tags").keyup(function () {
                 var input = $(this).val();
-                if (input.length >= 1) { // Kiểm tra nếu có ít nhất 2 ký tự được nhập
+                if (input.length >= 1) { // Kiểm tra nếu có ít nhất 1 ký tự được nhập
                     $.ajax({
                         url: "/Admin/Post/AutocompleteTags", // Địa chỉ URL xử lý autocomplete
                         type: "GET",

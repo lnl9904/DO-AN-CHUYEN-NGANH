@@ -1,4 +1,5 @@
-﻿
+﻿using BlogWebsite.Models;
+
 namespace BlogWebsite.ViewModels
 {
 	public class PostVM
@@ -13,6 +14,8 @@ namespace BlogWebsite.ViewModels
 		public int LikeCount { get; set; }
         public DateTime ModifiedDate { get; set; }
         public int WritingPhaseID { get; set; }
+		public string? WritingPhases { get; set; }
+		public bool IsPost { get; set; }
         public string? Download_path { get; set; }
         public decimal Royalty { get; set; }
     }

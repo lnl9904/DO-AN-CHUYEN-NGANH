@@ -1,6 +1,6 @@
 ﻿namespace BlogWebsite.Models
 {
-    public class WritingPhases
+    public class WritingPhase
     {
         public int Id { get; set; }
         public string? Title { get; set; }

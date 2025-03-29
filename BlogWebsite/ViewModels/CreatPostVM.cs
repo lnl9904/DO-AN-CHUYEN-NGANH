@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-
+using BlogWebsite.Models;
 namespace BlogWebsite.ViewModels
 {
 	public class CreatPostVM
@@ -11,10 +11,14 @@ namespace BlogWebsite.ViewModels
 		public string? TagName { get; set; }
 		public string? ApplicationUserId { get; set; }
         public int WritingPhaseID { get; set; }
+		public List<WritingPhase> WritingPhases { get; set; } = new List<WritingPhase>();
+		public DateTime CreatedDate { get; set; } = DateTime.Now;
+		public DateTime UpdatedDate { get; set; }
         public string? Description { get; set; }
 		public string? ThumbnailUrl { get; set; }
 		public IFormFile? Thumbnail { get; set; }
         public DateTime ModifiedDate { get; set; }
+		public bool IsPost { get; set; }
         public string? Download_path { get; set; }
         public decimal Royalty { get; set; }
     }
