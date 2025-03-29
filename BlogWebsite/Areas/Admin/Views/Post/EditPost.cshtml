@@ -94,7 +94,7 @@
     </div>
 </div>
 
-@section Scripts {
+@section Scripts{
     <partial name="_ValidationScriptsPartial" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -118,7 +118,8 @@
                 var newStatus = !currentStatus;
                 // Cập nhật hidden input
                 $("#IsPostInput").val(newStatus);
-                // Cập nhật badge hiển thị
+                // Cập
+              nhật badge hiển thị
                 var badge = $("#postStatusBadge");
                 if (newStatus) {
                     badge.removeClass("bg-warning").addClass("bg-success").text("Đã Đăng");

@@ -84,6 +84,13 @@
 						</a>
 						@if (User.IsInRole("Admin"))
 						{
+							<a class="nav-link" asp-controller="AssignPost" asp-action="Index" asp-area="Admin">
+								<div class="sb-nav-link-icon"><i class="fa-solid fa-users"></i></div>
+								Assign Writing Post
+							</a>
+						}
+						@if (User.IsInRole("Admin"))
+						{
 							<a class="nav-link" asp-controller="User" asp-action="Index" asp-area="Admin">
 								<div class="sb-nav-link-icon"><i class="fa-solid fa-users"></i></div>
 								Users
@@ -108,6 +115,23 @@
 								<a class="nav-link" asp-action="Index" asp-controller="Post" asp-area="Admin">
 									<div class="sb-nav-link-icon"><i class="fa-solid fa-newspaper"></i></div>
 									Posts
+								</a>
+							</nav>
+						</div>
+						<a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseTimePeriodManage" aria-expanded="false" aria-controls="collapseTimePeriodManage">
+							<div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
+							TimePeriodManage
+							<div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+						</a>
+						<div class="collapse" id="collapseTimePeriodManage" aria-labelledby="headingTimes" data-bs-parent="#sidenavAccordion">
+							<nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionTime">
+								<a class="nav-link" asp-controller="WritingPhases" asp-action="Index" asp-area="Admin">
+									<div class="sb-nav-link-icon"><i class="fa-solid fa-WritePhase"></i></div>
+									Writing Phase
+								</a>
+								<a class="nav-link" asp-controller="RegistrationPeriods" asp-action="Index" asp-area="Admin">
+									<div class="sb-nav-link-icon"><i class="fa-solid fa-RegisPeriods"></i></div>
+									Registration Period
 								</a>
 							</nav>
 						</div>
@@ -146,7 +170,6 @@
 								</nav>
 							</div>
 						}
-
 
 					</div>
 				</div>

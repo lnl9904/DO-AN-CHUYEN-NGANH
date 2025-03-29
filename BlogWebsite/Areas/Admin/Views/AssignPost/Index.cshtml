@@ -1,0 +1,82 @@
+﻿@using X.PagedList
+@using X.PagedList.Mvc.Core
+@using X.PagedList.Web.Common
+@model IPagedList<BlogWebsite.ViewModels.AssignPost.UserAssignmentViewModel>
+
+@{
+    ViewData["Title"] = "Assign Articles to Users";
+}
+
+<div class="container-fluid">
+    <h2 class="text-dark">Assign Articles to Users</h2>
+
+    <!-- Form chọn đợt viết bài + tìm kiếm -->
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <select id="campaignDropdown" name="campaignId" class="form-select">
+                <option value="">-- Select Writing Phase --</option>
+                @foreach (var campaign in ViewBag.WritingPhases)
+                {
+                    <option value="@campaign.Id" selected="@(ViewBag.SelectedCampaign == campaign.Id ? "selected" : null)">
+                        @campaign.Title (@campaign.StartDate.ToString("dd/MM/yyyy") - @campaign.EndDate.ToString("dd/MM/yyyy"))
+                    </option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-6">
+            <input name="keyword" type="search" class="form-control" placeholder="Search user..." value="@ViewBag.CurrentFilter" />
+        </div>
+
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-dark w-100">Search</button>
+        </div>
+    </div>
+
+    <!-- Danh sách user có thể nhận bài -->
+    <div class="card mt-3">
+        <div class="card-header bg-dark text-white">
+            <h4 class="card-title">List of Users Available for Assignment</h4>
+        </div>
+        <div class="card-body bg-light">
+            @if (Model.Count > 0)
+            {
+                <table class="table table-bordered table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>User Name</th>
+                            <th>Max Assignable</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model)
+                        {
+                            <tr>
+                                <td>@user.FullName</td>
+                                <td>@user.MaxAssignable</td>
+                                <td>
+                                    <form asp-area="Admin" asp-controller="AssignPost" asp-action="Assign" method="post">
+                                        <input type="hidden" name="UserId" value="@user.UserId" />
+                                        <input type="hidden" name="CampaignId" value="@ViewBag.SelectedCampaign" />
+                                        <input type="number" name="ArticleCount" class="form-control d-inline w-25" min="1" max="@user.MaxAssignable" required />
+                                        <button type="submit" class="btn btn-success">Assign</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p class="text-center text-danger">No users available for assignment.</p>
+            }
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="d-flex justify-content-center my-4">
+        @Html.PagedListPager(Model, page => Url.Action("Index", new { page, campaignId = ViewBag.SelectedCampaign, keyword = ViewBag.CurrentFilter }))
+    </div>
+</div>

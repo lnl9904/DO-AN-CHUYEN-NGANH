@@ -10,6 +10,9 @@ using Slugify;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Load configuration
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -63,11 +66,6 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 var app = builder.Build();
 
-
-
-builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-
-
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -75,16 +73,18 @@ if (!app.Environment.IsDevelopment())
 	app.UseHsts();
 }
 
-app.UseNotyf();
-
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseNotyf(); // Nên để ở đây
 app.UseSession();
-
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
 
 app.MapControllerRoute(
 	name: "area",

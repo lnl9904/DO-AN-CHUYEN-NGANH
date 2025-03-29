@@ -11,5 +11,6 @@
         public DateTime ModifiedAt { get; set; }
         public bool Is_Opening_registration { get; set; }
         public int RegistrationPeriodID { get; set; }
+        public string? AuthorName { get; set; }
     }
 }

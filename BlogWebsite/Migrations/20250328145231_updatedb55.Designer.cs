@@ -4,6 +4,7 @@ using BlogWebsite.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlogWebsite.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250328145231_updatedb55")]
+    partial class updatedb55
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -191,9 +193,6 @@ namespace BlogWebsite.Migrations
                     b.Property<string>("Slug")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Status")
-                        .HasColumnType("bit");
-
                     b.Property<int>("TagId")
                         .HasColumnType("int");
 
@@ -209,13 +208,16 @@ namespace BlogWebsite.Migrations
                     b.Property<int>("WritingPhaseID")
                         .HasColumnType("int");
 
+                    b.Property<int?>("WritingPhasesId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("TagId");
 
-                    b.HasIndex("WritingPhaseID");
+                    b.HasIndex("WritingPhasesId");
 
                     b.ToTable("posts");
                 });
@@ -722,11 +724,9 @@ namespace BlogWebsite.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BlogWebsite.Models.WritingPhase", "WritingPhases")
+                    b.HasOne("BlogWebsite.Models.WritingPhases", "WritingPhases")
                         .WithMany("posts")
-                        .HasForeignKey("WritingPhaseID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("WritingPhasesId");
 
                     b.Navigation("ApplicationUsers");
 
@@ -866,7 +866,7 @@ namespace BlogWebsite.Migrations
                     b.Navigation("ForumPosts");
                 });
 
-            modelBuilder.Entity("BlogWebsite.Models.WritingPhase", b =>
+            modelBuilder.Entity("BlogWebsite.Models.WritingPhases", b =>
                 {
                     b.Navigation("UserCapacities");
 

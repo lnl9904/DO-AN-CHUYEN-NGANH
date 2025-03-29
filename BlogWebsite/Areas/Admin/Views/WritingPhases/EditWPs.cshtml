@@ -1,0 +1,79 @@
+﻿@model BlogWebsite.ViewModels.WritingPhases.EditWritingPhasesVM
+
+@{
+    ViewData["Title"] = "EditWPs";
+}
+
+<div class="container-fluid">
+    <a class="btn btn-dark mb-2 mt-2" asp-action="Index" asp-controller="WritingPhases" asp-area="Admin">Go Back</a>
+    <div class="card">
+        <div class="card-header bg-dark">
+            <h4 class="card-title text-white">Edit Writing Phase</h4>
+        </div>
+        <div class="card-body">
+            <form asp-action="EditWPs">
+                <input type="hidden" asp-for="Id" />
+
+                <div class="row mb-3">
+                    <!-- Cột trái: Thông tin chung -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="fw-bold">Title</label>
+                            <input type="text" asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold">Amount of Articles</label>
+                            <input type="number" asp-for="AmountArticles" class="form-control" />
+                            <span asp-validation-for="AmountArticles" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="RegistrationPeriodID" class="fw-bold">Registration Period</label>
+                            <select asp-for="RegistrationPeriodID" class="form-control" asp-items="Model.RegistrationPeriods">
+                                <option value="">-- Select Registration Period --</option>
+                            </select>
+                            <span asp-validation-for="RegistrationPeriodID" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- Cột phải: Ngày tháng -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="fw-bold">Start Date</label>
+                            <input type="date" asp-for="StartDate" class="form-control" />
+                            <span asp-validation-for="StartDate" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold">End Date</label>
+                            <input type="date" asp-for="EndDate" class="form-control" />
+                            <span asp-validation-for="EndDate" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold">Last Modified</label>
+                            <input type="datetime-local" asp-for="ModifiedAt" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                            <span asp-validation-for="ModifiedAt" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Checkbox mở đăng ký -->
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" asp-for="Is_Opening_registration" id="opening-registration">
+                    <label class="form-check-label fw-bold" for="opening-registration">
+                        Open for Registration
+                    </label>
+                </div>
+
+                <!-- Nút Save -->
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
