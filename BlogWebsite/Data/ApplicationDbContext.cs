@@ -21,5 +21,7 @@ namespace BlogWebsite.Data
 		public DbSet<Reaction>? reactions { get; set; }
 		public DbSet<RegistrationPeriods>? registrationPeriods { get; set; }
 		public DbSet<WritingPhases>? writingPhases { get; set; }
+		public DbSet<UserCapacities>? userCapacities { get; set; }
+		public DbSet<Assignment>? assignments { get; set; }
 	}
 }

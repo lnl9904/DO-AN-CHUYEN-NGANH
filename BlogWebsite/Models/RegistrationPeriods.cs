@@ -4,7 +4,9 @@
     {
         public int Id { get; set; }
         public string? Title { get; set; }
-        public DateTime RegisStart { get; set; } // Đợt Đăng Ký
+		public string? ApplicationUserId { get; set; }
+		public ApplicationUser? ApplicationUsers { get; set; }
+		public DateTime RegisStart { get; set; } // Đợt Đăng Ký
         public DateTime RegisEnd { get; set; } // Đợt Đăng Ký
         public DateTime CreateAt { get; set; } = DateTime.Now;
         public DateTime ModifiedAt { get; set; }
@@ -12,5 +14,6 @@
         public DateTime RegisDeadlineEnd { get; set; }  // Hạn đợt Đăng Ký
         public bool Is_Opening_registration { get; set; }
         public ICollection<WritingPhases>? WritingPhases { get; set; }
-    }
+		public string? Slug { get; internal set; }
+	}
 }

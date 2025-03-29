@@ -1,4 +1,6 @@
-﻿namespace BlogWebsite.ViewModels.WritingPhases
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace BlogWebsite.ViewModels.WritingPhases
 {
     public class EditWritingPhasesVM
     {
@@ -11,5 +13,7 @@
         public DateTime ModifiedAt { get; set; }
         public bool Is_Opening_registration { get; set; }
         public int RegistrationPeriodID { get; set; }
+
+        public List<SelectListItem> RegistrationPeriods { get; set; } = new();
     }
 }

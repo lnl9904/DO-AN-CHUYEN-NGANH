@@ -1,0 +1,76 @@
+﻿@model BlogWebsite.ViewModels.RegistrationPeriods.CreateRegistrationPeriodsVM
+
+@{
+    ViewData["Title"] = "CreateRPs";
+}
+
+<div class="container-fluid">
+    <a class="btn btn-dark mb-2 mt-2" asp-action="Index" asp-controller="RegistrationPeriods" asp-area="Admin">Go Back</a>
+    <div class="card">
+        <div class="card-header bg-dark">
+            <h4 class="card-title text-white">Create Registration Period</h4>
+        </div>
+        <div class="card-body">
+            <form asp-action="CreateRPs" asp-controller="RegistrationPeriods" asp-area="Admin" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="row mb-3">
+                    <!-- Cột trái: Thông tin chung -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="fw-bold">Title</label>
+                            <input type="text" asp-for="Title" class="form-control" placeholder="Enter title" required />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold">Registration Start</label>
+                            <input type="date" asp-for="RegisStart" class="form-control" required />
+                            <span asp-validation-for="RegisStart" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold">Registration End</label>
+                            <input type="date" asp-for="RegisEnd" class="form-control" required />
+                            <span asp-validation-for="RegisEnd" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold">Deadline Start</label>
+                            <input type="date" asp-for="RegisDeadlineStart" class="form-control" required />
+                            <span asp-validation-for="RegisDeadlineStart" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold">Deadline End</label>
+                            <input type="date" asp-for="RegisDeadlineEnd" class="form-control" required />
+                            <span asp-validation-for="RegisDeadlineEnd" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- Cột phải: Ngày tạo & sửa -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="fw-bold">Last Modified</label>
+                            <input type="datetime-local" asp-for="ModifiedAt" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                            <span asp-validation-for="ModifiedAt" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Checkbox mở đăng ký -->
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" asp-for="Is_Opening_registration" id="opening-registration">
+                    <label class="form-check-label fw-bold" for="opening-registration">
+                        Open for Registration
+                    </label>
+                </div>
+
+                <!-- Nút Create -->
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

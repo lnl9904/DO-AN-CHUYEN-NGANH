@@ -4,6 +4,7 @@ using BlogWebsite.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlogWebsite.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250326091252_update-db44")]
+    partial class updatedb44
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,35 +23,6 @@ namespace BlogWebsite.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
-
-            modelBuilder.Entity("BlogWebsite.Models.Assignment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("ArticleCount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("WritingPhaseID")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("WritingPhasesId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
-
-                    b.HasIndex("WritingPhasesId");
-
-                    b.ToTable("assignments");
-                });
 
             modelBuilder.Entity("BlogWebsite.Models.Comment", b =>
                 {
@@ -349,35 +322,6 @@ namespace BlogWebsite.Migrations
                     b.ToTable("topics");
                 });
 
-            modelBuilder.Entity("BlogWebsite.Models.UserCapacities", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("MaxAssignable")
-                        .HasColumnType("int");
-
-                    b.Property<int>("WritingPhaseID")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("WritingPhasesId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
-
-                    b.HasIndex("WritingPhasesId");
-
-                    b.ToTable("userCapacities");
-                });
-
             modelBuilder.Entity("BlogWebsite.Models.WritingPhases", b =>
                 {
                     b.Property<int>("Id")
@@ -645,25 +589,7 @@ namespace BlogWebsite.Migrations
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("MaxArticles")
-                        .HasColumnType("int");
-
                     b.HasDiscriminator().HasValue("ApplicationUser");
-                });
-
-            modelBuilder.Entity("BlogWebsite.Models.Assignment", b =>
-                {
-                    b.HasOne("BlogWebsite.Models.ApplicationUser", "ApplicationUsers")
-                        .WithMany()
-                        .HasForeignKey("ApplicationUserId");
-
-                    b.HasOne("BlogWebsite.Models.WritingPhases", "WritingPhases")
-                        .WithMany()
-                        .HasForeignKey("WritingPhasesId");
-
-                    b.Navigation("ApplicationUsers");
-
-                    b.Navigation("WritingPhases");
                 });
 
             modelBuilder.Entity("BlogWebsite.Models.Comment", b =>
@@ -749,21 +675,6 @@ namespace BlogWebsite.Migrations
                         .HasForeignKey("ApplicationUserId");
 
                     b.Navigation("ApplicationUsers");
-                });
-
-            modelBuilder.Entity("BlogWebsite.Models.UserCapacities", b =>
-                {
-                    b.HasOne("BlogWebsite.Models.ApplicationUser", "ApplicationUsers")
-                        .WithMany()
-                        .HasForeignKey("ApplicationUserId");
-
-                    b.HasOne("BlogWebsite.Models.WritingPhases", "WritingPhases")
-                        .WithMany("UserCapacities")
-                        .HasForeignKey("WritingPhasesId");
-
-                    b.Navigation("ApplicationUsers");
-
-                    b.Navigation("WritingPhases");
                 });
 
             modelBuilder.Entity("BlogWebsite.Models.WritingPhases", b =>
@@ -866,8 +777,6 @@ namespace BlogWebsite.Migrations
 
             modelBuilder.Entity("BlogWebsite.Models.WritingPhases", b =>
                 {
-                    b.Navigation("UserCapacities");
-
                     b.Navigation("posts");
                 });
 #pragma warning restore 612, 618

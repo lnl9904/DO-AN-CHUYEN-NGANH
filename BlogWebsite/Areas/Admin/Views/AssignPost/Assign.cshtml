@@ -1,0 +1,48 @@
+﻿@model BlogWebsite.ViewModels.AssignPost.AssignmentRequestViewModel
+
+@{
+    ViewData["Title"] = "Assign Post";
+}
+
+<h1>Assign Post</h1>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Assign">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- Chọn User -->
+            <div class="form-group">
+                <label asp-for="UserId" class="control-label">Select User</label>
+                <select asp-for="UserId" class="form-control" asp-items="ViewBag.Users"></select>
+                <span asp-validation-for="UserId" class="text-danger"></span>
+            </div>
+
+            <!-- Chọn Writing Phase -->
+            <div class="form-group">
+                <label asp-for="WritingPhaseId" class="control-label">Select Writing Phase</label>
+                <select asp-for="WritingPhaseId" class="form-control" asp-items="ViewBag.WritingPhases"></select>
+                <span asp-validation-for="WritingPhaseId" class="text-danger"></span>
+            </div>
+
+            <!-- Nhập số lượng bài viết -->
+            <div class="form-group">
+                <label asp-for="ArticleCount" class="control-label">Number of Articles</label>
+                <input asp-for="ArticleCount" type="number" min="1" class="form-control" />
+                <span asp-validation-for="ArticleCount" class="text-danger"></span>
+            </div>
+
+            <!-- Nút lưu -->
+            <div class="form-group mt-3">
+                <button type="submit" class="btn btn-primary">Assign</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

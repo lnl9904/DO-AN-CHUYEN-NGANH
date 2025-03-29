@@ -7,6 +7,6 @@ namespace BlogWebsite.Models
 		public string? FirstName { get; set; }
 		public string? LastName { get; set; }
 		public bool IsLocked { get; set; }
-
-	}
+        public int MaxArticles { get; set; } // Giới hạn bài có thể nhận
+    }
 }
